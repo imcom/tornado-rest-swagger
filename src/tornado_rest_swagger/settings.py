@@ -11,6 +11,7 @@ URL_SWAGGER_API_LIST = 'swagger-api-list'
 URL_SWAGGER_API_SPEC = 'swagger-api-spec'
 
 ASSETS_PATH = os.path.join(os.path.dirname(os.path.normpath(__file__)), 'assets')
+DEFAULT_LOGGING_FORMAT = "%(asctime)s [%(process)d:%(threadName)s] %(name)s %(levelname)s %(message)s"
 
 default_settings = {
     'base_url': '/',

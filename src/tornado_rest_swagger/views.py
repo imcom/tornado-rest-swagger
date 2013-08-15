@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 import urlparse
 import json
+import logging
+from settings import DEFAULT_LOGGING_FORMAT as LOG_FORMAT
 
 import tornado.web
 import tornado.template
@@ -15,6 +17,8 @@ __author__ = 'flier'
 def json_dumps(obj, pretty=False):
     return json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': ')) if pretty else json.dumps(obj)
 
+logging.basicConfig(format=LOG_FORMAT)
+logger = logging.getLogger('swagger-handlers')
 
 class SwaggerUIHandler(tornado.web.RequestHandler):
     def initialize(self, assets_path, **kwds):
@@ -25,6 +29,7 @@ class SwaggerUIHandler(tornado.web.RequestHandler):
 
     def get(self):
         discovery_url = urlparse.urljoin(self.request.full_url(), self.reverse_url(URL_SWAGGER_API_LIST))
+        logger.debug('discovery: %s' % discovery_url)
 
         self.render('index.html', discovery_url=discovery_url)
 
