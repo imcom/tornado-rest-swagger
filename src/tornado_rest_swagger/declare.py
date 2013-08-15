@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import inspect
+import logging
 
 from functools import wraps
 
@@ -8,9 +9,11 @@ import epydoc.markup
 
 __author__ = 'flier'
 
+logger = logging.getLogger('swagger-api')
 
 class rest_api(object):
     def __init__(self, func_or_name, summary=None, notes=None, responseClass=None, errors=None, **kwds):
+        logger.debug('rest API init')
         self.summary = summary
         self.notes = notes
         self.responseClass = responseClass
@@ -118,6 +121,7 @@ def discover_rest_apis(host_handlers):
         for spec in handlers:
             for (name, member) in inspect.getmembers(spec.handler_class):
                 if inspect.ismethod(member) and hasattr(member, 'rest_api'):
+                    logger.debug('found API: %s' % member)
                     yield spec._path % tuple(['{%s}' % arg for arg in member.rest_api.func_args]), inspect.getdoc(spec.handler_class)
 
                     break

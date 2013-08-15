@@ -3,7 +3,6 @@
 import urlparse
 import json
 import logging
-from settings import DEFAULT_LOGGING_FORMAT as LOG_FORMAT
 
 import tornado.web
 import tornado.template
@@ -17,7 +16,6 @@ __author__ = 'flier'
 def json_dumps(obj, pretty=False):
     return json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': ')) if pretty else json.dumps(obj)
 
-logging.basicConfig(format=LOG_FORMAT)
 logger = logging.getLogger('swagger-handlers')
 
 class SwaggerUIHandler(tornado.web.RequestHandler):
