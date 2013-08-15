@@ -14,7 +14,7 @@ setup(
     packages = find_packages('src'),
     package_dir = {'':'src'},
     package_data = {
-        'tornado_rest_swagger': ['assets/*/*'],
+        'tornado_rest_swagger': ['assets/*/*', 'assets/*.html', 'assets/*.js'],
     },
     zip_safe = False,
     install_requires = [
