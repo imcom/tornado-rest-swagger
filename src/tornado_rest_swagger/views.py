@@ -1,14 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import urlparse
 import json
 import logging
 
+import urlparse
 import tornado.web
 import tornado.template
-
 from tornado_rest_swagger.settings import SWAGGER_VERSION, URL_SWAGGER_API_LIST
 from tornado_rest_swagger.declare import discover_rest_apis, find_rest_api
+
 
 __author__ = 'flier'
 
@@ -17,6 +17,7 @@ def json_dumps(obj, pretty=False):
     return json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': ')) if pretty else json.dumps(obj)
 
 logger = logging.getLogger('swagger-handlers')
+
 
 class SwaggerUIHandler(tornado.web.RequestHandler):
     def initialize(self, assets_path, **kwds):
