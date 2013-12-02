@@ -20,5 +20,5 @@ def handle_apidoc_urls(prefix, **opts):
         URLSpec(prefix + r'spec/$',             SwaggerResourcesHandler, default_settings, name=URL_SWAGGER_API_LIST),
         URLSpec(prefix + r'spec/(?P<path>.*)$', SwaggerApiHandler,       default_settings, name=URL_SWAGGER_API_SPEC),
 
-        (prefix + r'(.*\.(css|png|gif|js))',    StaticFileHandler,       { 'path': ASSETS_PATH }),
+        (prefix + r'(.*\.(css|png|gif|js))',    StaticFileHandler,       {'path': ASSETS_PATH}),
     ]

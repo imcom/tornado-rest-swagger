@@ -20,6 +20,7 @@ logger = logging.getLogger('swagger-handlers')
 
 
 class SwaggerUIHandler(tornado.web.RequestHandler):
+
     def initialize(self, assets_path, **kwds):
         self.assets_path = assets_path
 
@@ -83,14 +84,12 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
         spec, apis = result
 
-        u = urlparse.urlparse(self.request.full_url())
-
         spec = {
             'apiVersion': self.api_version,
             'swaggerVersion': SWAGGER_VERSION,
             'basePath': urlparse.urljoin(self.request.full_url(), self.base_url),
             'apis': [{
-                'path': '/' + path,
+                'path': spec.path,
                 'description': spec.handler_class.__doc__,
                 'operations': [{
                     'httpMethod': api.func.__name__.upper(),
@@ -98,7 +97,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                     'parameters': api.params.values(),
                     'summary': api.summary,
                     'notes': api.notes,
-                    'responseClass': api.responseClass,
+                    'responseClass': api.response_class,
                     'errorResponses': api.errors,
                 } for api in apis]
             }]

@@ -4,7 +4,7 @@ import os.path
 
 __author__ = 'flier'
 
-SWAGGER_VERSION = '1.1.15'
+SWAGGER_VERSION = '1.2'
 
 URL_SWAGGER_API_DOCS = 'swagger-api-docs'
 URL_SWAGGER_API_LIST = 'swagger-api-list'
@@ -17,8 +17,8 @@ default_settings = {
     'base_url': '/',
     'assets_path': ASSETS_PATH,
 
-    'api_version': '',
+    'api_version': '0.2.2',
     'api_key': '',
-    'enabled_methods': ['get', 'post', 'put', 'patch', 'delete'],
+    'enabled_methods': ['get', 'post', 'put', 'delete'],
     'exclude_namespaces': [],
 }

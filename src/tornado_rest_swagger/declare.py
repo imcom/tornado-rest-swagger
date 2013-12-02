@@ -11,13 +11,16 @@ __author__ = 'flier'
 
 logger = logging.getLogger('swagger-api')
 
-class rest_api(object):
-    def __init__(self, func_or_name, summary=None, notes=None, responseClass=None, errors=None, **kwds):
-        logger.debug('rest API init')
+
+class RestAPI(object):
+    def __init__(self, func_or_name, summary=None, notes=None, responseClass=None, errors=None,
+                 arguments=None, form_arguments=None, **kwds):
         self.summary = summary
         self.notes = notes
-        self.responseClass = responseClass
+        self.response_class = responseClass
         self.errors = errors or []
+        self.func_args = arguments or []
+        self.form_args = form_arguments or []
 
         self.kwds = kwds
 
@@ -33,8 +36,9 @@ class rest_api(object):
         self.func = func
 
         self.__name__ = func.__name__
-        self.func_args, self.func_varargs, self.func_keywords, self.func_defaults = inspect.getargspec(func)
-        self.func_args = self.func_args
+        _func_args, self.func_varargs, self.func_keywords, self.func_defaults = \
+            inspect.getargspec(func)
+        #self.func_args = self.func_args
 
         if len(self.func_args) > 0 and self.func_args[0] == 'self':
             self.func_args = self.func_args[1:]
@@ -46,10 +50,19 @@ class rest_api(object):
             'dataType': 'string'
         }) for arg in self.func_args])
 
+        if self.form_args:
+            self.params.update([(arg, {
+                'name': arg,
+                'required': True,
+                'paramType': 'form',
+                'dataType': 'string'
+            }) for arg in self.form_args])
+
         doc = self.parse_docstring(inspect.getdoc(self.func))
 
         if self.summary is None:
-            self.summary = inspect.getcomments(self.func) or doc.to_plaintext(None).split('\n')[0].strip()
+            self.summary = inspect.getcomments(self.func) or \
+                           doc.to_plaintext(None).split('\n')[0].strip()
 
         if self.summary:
             self.summary = self.summary.strip()
@@ -102,7 +115,7 @@ class rest_api(object):
                     'dataType': body
                 })
             elif field.tag() == 'rtype':
-                self.responseClass = arg
+                self.response_class = arg
             elif field.tag() == 'raise':
                 self.errors.append({
                     'code': arg,
@@ -121,9 +134,18 @@ def discover_rest_apis(host_handlers):
         for spec in handlers:
             for (name, member) in inspect.getmembers(spec.handler_class):
                 if inspect.ismethod(member) and hasattr(member, 'rest_api'):
-                    logger.debug('found API: %s' % member)
-                    yield spec._path % tuple(['{%s}' % arg for arg in member.rest_api.func_args]), inspect.getdoc(spec.handler_class)
-
+                    try:
+                        #yield spec._path % \
+                        #    tuple(['{%s}' % arg for arg in member.rest_api.func_args]), \
+                        #    inspect.getdoc(spec.handler_class)
+                        api_location = filter(lambda x: x != "%s", spec._path[1:].split('/'))
+                        if len(api_location) > 1:
+                            api_location = "_".join(api_location)
+                        else:
+                            api_location = api_location[0]
+                        yield api_location, inspect.getdoc(spec.handler_class)
+                    except TypeError:
+                        yield spec._path[1], inspect.getdoc(spec.handler_class)
                     break
 
 
@@ -132,10 +154,22 @@ def find_rest_api(host_handlers, path):
         for spec in handlers:
             for (name, member) in inspect.getmembers(spec.handler_class):
                 if inspect.ismethod(member) and hasattr(member, 'rest_api'):
-                    spec_path = spec._path % tuple(['{%s}' % arg for arg in member.rest_api.func_args])
+                    try:
+                        spec_path = spec._path % tuple(
+                            ['{%s}' % arg for arg in member.rest_api.func_args])
+                        api_location = filter(lambda x: x != "%s", spec._path[1:].split('/'))
+                        if len(api_location) > 1:
+                            api_location = "_".join(api_location)
+                        else:
+                            api_location = api_location[0]
+                    except TypeError:
+                        api_location = spec._path[1]
+                    spec.path = spec_path[1:]
 
-                    if path == spec_path[1:]:
-                        operations = [member.rest_api for (name, member) in inspect.getmembers(spec.handler_class) if hasattr(member, 'rest_api')]
+                    if path == api_location:#spec_path[1:]:
+                        operations = [member.rest_api for (name, member) in
+                                      inspect.getmembers(spec.handler_class) if
+                                      hasattr(member, 'rest_api')]
 
                         return spec, operations
 

@@ -6,4 +6,4 @@ from tornado_rest_swagger.urls import *
 __author__ = 'flier'
 
 
-__all__ = ['rest_api', 'discover_rest_apis', 'handle_apidoc_urls']
+__all__ = ['RestAPI', 'discover_rest_apis', 'handle_apidoc_urls']
